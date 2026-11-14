@@ -1,0 +1,9 @@
+# MegaLinter configuration
+VALIDATE_ALL_CODE_BASE: true
+PRINT_ALPACA: false
+SHOW_ELAPSED_TIME: true
+FILEIO_REPORTER: false
+SPELL_CSPELL_DISABLE_ERRORS: true
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .github/linters/.markdownlint.json
+PYTHON_BLACK_CONFIG_FILE: ground_station/pyproject.toml
+PYTHON_RUFF_CONFIG_FILE: ground_station/pyproject.toml
