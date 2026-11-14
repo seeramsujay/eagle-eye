@@ -1,24 +1,34 @@
-import pytest
-import struct
-import sys
 import os
+import sys
+
+import pytest
 
 # Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from lora_link import (
-    calculate_crc16, UplinkPacket, DownlinkPacket, LoRaLink,
-    MODE_VISION_TRACK, MODE_MANUAL_FPV, FLAG_ARMED, FLAG_GPS_FIX
+    FLAG_ARMED,
+    FLAG_GPS_FIX,
+    MODE_MANUAL_FPV,
+    MODE_VISION_TRACK,
+    DownlinkPacket,
+    LoRaLink,
+    UplinkPacket,
+    calculate_crc16,
 )
 
 
 def test_packet_sizes():
-    assert UplinkPacket.SIZE == 16, f"UplinkPacket must be exactly 16 bytes, got {UplinkPacket.SIZE}"
-    assert DownlinkPacket.SIZE == 16, f"DownlinkPacket must be exactly 16 bytes, got {DownlinkPacket.SIZE}"
+    assert UplinkPacket.SIZE == 16, (
+        f"UplinkPacket must be exactly 16 bytes, got {UplinkPacket.SIZE}"
+    )
+    assert DownlinkPacket.SIZE == 16, (
+        f"DownlinkPacket must be exactly 16 bytes, got {DownlinkPacket.SIZE}"
+    )
 
 
 def test_crc16_integrity():
-    data = b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E"
+    data = b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e"
     crc = calculate_crc16(data)
     assert isinstance(crc, int)
     assert 0 <= crc <= 0xFFFF
@@ -26,7 +36,7 @@ def test_crc16_integrity():
     # Verify deterministic calculation
     assert calculate_crc16(data) == crc
     # Any single bit flip must change CRC
-    data_corrupt = b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0F"
+    data_corrupt = b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0f"
     assert calculate_crc16(data_corrupt) != crc
 
 
@@ -37,7 +47,7 @@ def test_uplink_pack_unpack_roundtrip():
         pitch_deg=-3.4,
         throttle_pct=72,
         car_lat=15.4909123,
-        car_lon=73.8278456
+        car_lon=73.8278456,
     )
     packed = original.pack()
     assert len(packed) == 16
@@ -53,7 +63,9 @@ def test_uplink_pack_unpack_roundtrip():
 
 
 def test_uplink_corruption_rejection():
-    pkt = UplinkPacket(mode=MODE_MANUAL_FPV, roll_deg=10.0, pitch_deg=5.0, throttle_pct=50)
+    pkt = UplinkPacket(
+        mode=MODE_MANUAL_FPV, roll_deg=10.0, pitch_deg=5.0, throttle_pct=50
+    )
     packed = bytearray(pkt.pack())
     # Corrupt a payload byte
     packed[2] ^= 0xFF
@@ -68,7 +80,7 @@ def test_downlink_pack_unpack_roundtrip():
         speed_kmh=48.0,
         heading_deg=184.0,
         batt_v=11.4,
-        state_flags=FLAG_ARMED | FLAG_GPS_FIX
+        state_flags=FLAG_ARMED | FLAG_GPS_FIX,
     )
     packed = original.pack()
     assert len(packed) == 16

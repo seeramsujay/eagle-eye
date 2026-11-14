@@ -1,9 +1,9 @@
-import pytest
-import math
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import pytest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from pursuit_controller import GPSMath
 
@@ -14,7 +14,7 @@ def test_haversine_distance():
     lat2, lon2 = 18.9438, 72.8232
 
     dist = GPSMath.haversine_distance(lat1, lon1, lat2, lon2)
-    assert 2500.0 < dist < 3000.0 # ~3.0 - 3.2 km
+    assert 2500.0 < dist < 3000.0  # ~3.0 - 3.2 km
 
 
 def test_bearing_calculation():

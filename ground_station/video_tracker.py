@@ -4,21 +4,27 @@ Integrates YOLOv8n ('car' class) + OpenCV CSRT Fallback with Appearance Verifica
 + Constant Velocity Kalman Filter
 """
 
+import time
+from typing import Any
+
 import cv2
 import numpy as np
-import time
-from typing import Optional, Tuple, Dict, Any
 from kalman_tracker import ConstantVelocityKalmanTracker
 
 
 class AerialVideoTracker:
-    def __init__(self, use_yolo: bool = True, model_name: str = "yolov8n.pt", conf_thresh: float = 0.35):
+    def __init__(
+        self,
+        use_yolo: bool = True,
+        model_name: str = "yolov8n.pt",
+        conf_thresh: float = 0.35,
+    ):
         self.use_yolo = use_yolo
         self.conf_thresh = conf_thresh
         self.yolo_model = None
-        self.csrt_tracker: Optional[cv2.Tracker] = None
-        self.reference_hist: Optional[np.ndarray] = None
-        self.kalman: Optional[ConstantVelocityKalmanTracker] = None
+        self.csrt_tracker: cv2.Tracker | None = None
+        self.reference_hist: np.ndarray | None = None
+        self.kalman: ConstantVelocityKalmanTracker | None = None
 
         self.tracking_active = False
         self.consecutive_detect_frames = 0
@@ -28,12 +34,15 @@ class AerialVideoTracker:
         if self.use_yolo:
             try:
                 from ultralytics import YOLO
+
                 self.yolo_model = YOLO(model_name)
-            except Exception as e:
-                print(f"[AerialVideoTracker] Warning: YOLO init failed ({e}). Defaulting to CSRT tracker.")
+            except (ImportError, RuntimeError, ValueError) as e:
+                print(
+                    f"[AerialVideoTracker] Warning: YOLO init failed ({e}). Defaulting to CSRT tracker."
+                )
                 self.use_yolo = False
 
-    def init_manual_roi(self, frame: np.ndarray, bbox: Tuple[int, int, int, int]):
+    def init_manual_roi(self, frame: np.ndarray, bbox: tuple[int, int, int, int]):
         """
         Initializes tracking via manual ROI (x, y, w, h)
         """
@@ -51,13 +60,16 @@ class AerialVideoTracker:
             self.csrt_tracker.init(frame, (x, y, w, h))
 
             # Store reference appearance histogram in HSV color space
-            crop = frame[max(0, y):min(frame.shape[0], y + h), max(0, x):min(frame.shape[1], x + w)]
+            crop = frame[
+                max(0, y) : min(frame.shape[0], y + h),
+                max(0, x) : min(frame.shape[1], x + w),
+            ]
             if crop.size > 0:
                 hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
                 hist = cv2.calcHist([hsv], [0, 1], None, [16, 16], [0, 180, 0, 256])
                 cv2.normalize(hist, hist, 0, 1, cv2.NORM_MINMAX)
                 self.reference_hist = hist
-        except Exception:
+        except (cv2.error, ValueError, TypeError):
             self.csrt_tracker = None
             self.reference_hist = None
 
@@ -66,7 +78,7 @@ class AerialVideoTracker:
         self.consecutive_lost_frames = 0
         self.last_detection_timestamp = time.time()
 
-    def process_frame(self, frame: np.ndarray, dt: float) -> Dict[str, Any]:
+    def process_frame(self, frame: np.ndarray, dt: float) -> dict[str, Any]:
         """
         Processes a single video frame and returns tracking metadata
         """
@@ -77,17 +89,19 @@ class AerialVideoTracker:
 
         result = {
             "detected": False,
-            "bbox": None, # (x1, y1, x2, y2)
-            "center": None, # (cx, cy)
+            "bbox": None,  # (x1, y1, x2, y2)
+            "center": None,  # (cx, cy)
             "area": None,
             "error_x_px": 0.0,
             "error_y_px": 0.0,
-            "error_x_norm": 0.0, # [-1.0, 1.0]
-            "error_y_norm": 0.0, # [-1.0, 1.0]
+            "error_x_norm": 0.0,  # [-1.0, 1.0]
+            "error_y_norm": 0.0,  # [-1.0, 1.0]
             "kalman_pred_bbox": None,
             "kalman_velocity": (0.0, 0.0),
             "consecutive_detects": self.consecutive_detect_frames,
-            "time_since_detect": current_time - self.last_detection_timestamp if self.last_detection_timestamp > 0 else 999.0
+            "time_since_detect": current_time - self.last_detection_timestamp
+            if self.last_detection_timestamp > 0
+            else 999.0,
         }
 
         # 1. Kalman Prediction step
@@ -101,7 +115,9 @@ class AerialVideoTracker:
         # 2. YOLOv8 Detection (Class 2 = car in COCO)
         if self.use_yolo and self.yolo_model is not None:
             try:
-                detections = self.yolo_model(frame, classes=[2], conf=self.conf_thresh, verbose=False)[0]
+                detections = self.yolo_model(
+                    frame, classes=[2], conf=self.conf_thresh, verbose=False
+                )[0]
                 best_iou = 0.0
                 best_box = None
 
@@ -122,7 +138,7 @@ class AerialVideoTracker:
 
                 if best_box is not None and (self.kalman is None or best_iou > 0.15):
                     matched_bbox = best_box
-            except Exception:
+            except (AttributeError, ValueError, IndexError):
                 pass
 
         # 3. Fallback to OpenCV CSRT Tracker if YOLO missed
@@ -194,7 +210,9 @@ class AerialVideoTracker:
         return result
 
     @staticmethod
-    def _calculate_iou(boxA: Tuple[float, float, float, float], boxB: Tuple[float, float, float, float]) -> float:
+    def _calculate_iou(
+        boxA: tuple[float, float, float, float], boxB: tuple[float, float, float, float]
+    ) -> float:
         xA = max(boxA[0], boxB[0])
         yA = max(boxA[1], boxB[1])
         xB = min(boxA[2], boxB[2])

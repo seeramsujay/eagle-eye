@@ -1,19 +1,20 @@
-import pytest
-import numpy as np
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import numpy as np
+import pytest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from kalman_tracker import ConstantVelocityKalmanTracker
-from pursuit_controller import PursuitController, PIDVisualServoing
 from lora_link import MODE_VISION_TRACK, DownlinkPacket
+from pursuit_controller import PIDVisualServoing, PursuitController
 
 
 def test_kalman_constant_velocity_tracking():
     # True target starts at cx=100, moving with vx=50 px/sec
     kf = ConstantVelocityKalmanTracker(init_cx=100.0, init_cy=200.0, init_area=5000.0)
-    dt = 0.04 # 25 Hz update rate
+    dt = 0.04  # 25 Hz update rate
 
     true_cx = 100.0
     vx = 50.0
@@ -26,7 +27,7 @@ def test_kalman_constant_velocity_tracking():
         kf.update(noisy_meas, 200.0, 5000.0)
 
     est_cx, est_cy = kf.position
-    est_vx, est_vy = kf.velocity
+    est_vx, _est_vy = kf.velocity
 
     assert pytest.approx(est_cx, abs=5.0) == true_cx
     assert pytest.approx(est_vx, abs=10.0) == vx
@@ -70,7 +71,9 @@ def test_visual_servoing_pid_bounds():
 
 def test_pursuit_controller_vision_servo_response():
     pursuit = PursuitController(target_box_area=10000.0)
-    telem = DownlinkPacket(plane_lat=15.0, plane_lon=73.0, alt_m=50.0, speed_kmh=45.0, heading_deg=90.0)
+    telem = DownlinkPacket(
+        plane_lat=15.0, plane_lon=73.0, alt_m=50.0, speed_kmh=45.0, heading_deg=90.0
+    )
 
     # Target off-center to the right (error_x_norm = +0.5)
     tracking_info = {
@@ -78,10 +81,10 @@ def test_pursuit_controller_vision_servo_response():
         "error_x_norm": 0.5,
         "error_y_norm": 0.0,
         "area": 10000.0,
-        "time_since_detect": 0.0
+        "time_since_detect": 0.0,
     }
 
     uplink = pursuit.update(tracking_info, telem, car_lat=15.0, car_lon=73.0, dt=0.04)
     assert uplink.mode == MODE_VISION_TRACK
-    assert uplink.roll_deg > 0.0 # Must bank right into turn
+    assert uplink.roll_deg > 0.0  # Must bank right into turn
     assert 35 <= uplink.throttle_pct <= 85

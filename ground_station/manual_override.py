@@ -4,12 +4,17 @@ Supports USB gamepad (/dev/input/js0, pygame, or inputs) + Keyboard Hotkeys
 Guarantees autonomy preemption latency < 5 ms
 """
 
-import time
 import os
 import struct
 import threading
-from typing import Tuple, Optional
-from lora_link import MODE_MANUAL_FPV, MODE_VISION_TRACK, MODE_RETURN_TO_CAR, UplinkPacket
+import time
+
+from lora_link import (
+    MODE_MANUAL_FPV,
+    MODE_RETURN_TO_CAR,
+    MODE_VISION_TRACK,
+    UplinkPacket,
+)
 
 
 class ManualOverrideManager:
@@ -26,7 +31,7 @@ class ManualOverrideManager:
         self.desired_mode = MODE_VISION_TRACK
 
         self.running = False
-        self.thread: Optional[threading.Thread] = None
+        self.thread: threading.Thread | None = None
         self._lock = threading.Lock()
 
     def start(self):
@@ -61,7 +66,9 @@ class ManualOverrideManager:
             self.stick_pitch = max(-1.0, min(1.0, pitch))
             self.stick_throttle_pct = max(0, min(100, int(throttle_pct)))
 
-    def apply_override_if_active(self, autonomous_uplink: UplinkPacket) -> Tuple[UplinkPacket, bool]:
+    def apply_override_if_active(
+        self, autonomous_uplink: UplinkPacket
+    ) -> tuple[UplinkPacket, bool]:
         """
         Preempts autonomous uplink command if manual override is active.
         Execution completes in < 5 microseconds.
@@ -74,7 +81,11 @@ class ManualOverrideManager:
                 # Roll [-1.0, 1.0] -> [-35.0, +35.0] deg
                 # Pitch [-1.0, 1.0] -> [-15.0, +20.0] deg
                 roll_deg = self.stick_roll * 35.0
-                pitch_deg = self.stick_pitch * 20.0 if self.stick_pitch >= 0 else self.stick_pitch * 15.0
+                pitch_deg = (
+                    self.stick_pitch * 20.0
+                    if self.stick_pitch >= 0
+                    else self.stick_pitch * 15.0
+                )
                 throttle = self.stick_throttle_pct
 
                 override_pkt = UplinkPacket(
@@ -83,7 +94,7 @@ class ManualOverrideManager:
                     pitch_deg=pitch_deg,
                     throttle_pct=throttle,
                     car_lat=autonomous_uplink.car_lat,
-                    car_lon=autonomous_uplink.car_lon
+                    car_lon=autonomous_uplink.car_lon,
                 )
                 self.preemption_latency_ms = (time.perf_counter() - t0) * 1000.0
                 return override_pkt, True
@@ -99,16 +110,16 @@ class ManualOverrideManager:
         - 50 ('2'): Set mode VISION_TRACK (Engage Autonomy)
         - 51 ('3'): Set mode RETURN_TO_CAR
         """
-        if key == 32: # SPACE
+        if key == 32:  # SPACE
             self.trigger_takeover("KEYBOARD_SPACE")
             return True
-        elif key == ord('1'):
+        elif key == ord("1"):
             self.trigger_takeover("KEY_1_MANUAL")
             return True
-        elif key == ord('2'):
+        elif key == ord("2"):
             self.release_to_autonomy(MODE_VISION_TRACK)
             return True
-        elif key == ord('3'):
+        elif key == ord("3"):
             self.release_to_autonomy(MODE_RETURN_TO_CAR)
             return True
         return False
@@ -134,7 +145,7 @@ class ManualOverrideManager:
 
                     # Button event
                     if evt_type & 0x01:
-                        if val == 1: # Button pressed
+                        if val == 1:  # Button pressed
                             # Any button press instantly triggers manual override
                             self.trigger_takeover(f"GAMEPAD_BTN_{num}")
 
@@ -142,16 +153,21 @@ class ManualOverrideManager:
                     elif evt_type & 0x02:
                         norm_val = val / 32767.0
                         with self._lock:
-                            if num == 0:   # Roll (Aileron stick)
+                            if num == 0:  # Roll (Aileron stick)
                                 self.stick_roll = norm_val
-                            elif num == 1: # Pitch (Elevator stick)
-                                self.stick_pitch = -norm_val # Invert standard joystick
-                            elif num == 2 or num == 3: # Throttle stick
-                                self.stick_throttle_pct = int(((norm_val + 1.0) / 2.0) * 100)
+                            elif num == 1:  # Pitch (Elevator stick)
+                                self.stick_pitch = -norm_val  # Invert standard joystick
+                            elif num == 2 or num == 3:  # Throttle stick
+                                self.stick_throttle_pct = int(
+                                    ((norm_val + 1.0) / 2.0) * 100
+                                )
 
                             # If stick moved significantly from center, trigger takeover
-                            if abs(self.stick_roll) > 0.15 or abs(self.stick_pitch) > 0.15:
+                            if (
+                                abs(self.stick_roll) > 0.15
+                                or abs(self.stick_pitch) > 0.15
+                            ):
                                 self.manual_override_active = True
                                 self.desired_mode = MODE_MANUAL_FPV
-        except Exception:
+        except (OSError, struct.error):
             pass

@@ -1,0 +1,51 @@
+{
+  "project": "Project Eagle-Eye v0 Micro",
+  "aircraft_type": "Twin-Coreless Micro Flying Wing (210mm span)",
+  "all_up_weight_target_g": 32.0,
+  "currency": "INR",
+  "total_spend_inr": 485.0,
+  "components": [
+    {
+      "item": "716 Coreless Brushed Motors (1S 50,000 RPM, 1 CW + 1 CCW Pair)",
+      "qty": 1,
+      "price_inr": 135.0,
+      "vendor": "QuartzComponents / Robu.in",
+      "url": "https://quartzcomponents.com/products/coreless-motor-716"
+    },
+    {
+      "item": "55mm Micro Propellers (1 CW + 1 CCW, 0.8mm shaft)",
+      "qty": 1,
+      "price_inr": 45.0,
+      "vendor": "Robu.in",
+      "url": "https://robu.in/product/55mm-propeller-blade-for-716-coreless-motor/"
+    },
+    {
+      "item": "SI2302 / AO3400 N-Channel Power MOSFETs (SOT-23 30V 5A)",
+      "qty": 2,
+      "price_inr": 20.0,
+      "vendor": "QuartzComponents",
+      "url": "https://quartzcomponents.com/products/ao3400a-n-channel-mosfet"
+    },
+    {
+      "item": "1N4148 Fast Flyback Protection Diodes + 10k Gate Resistors",
+      "qty": 2,
+      "price_inr": 10.0,
+      "vendor": "QuartzComponents",
+      "url": "https://quartzcomponents.com/products/1n4148-diode"
+    },
+    {
+      "item": "1S 3.7V 300mAh 30C LiPo Battery (BT2.0 / PH2.0 Connector)",
+      "qty": 1,
+      "price_inr": 185.0,
+      "vendor": "Robu.in / ElectronicsComp",
+      "url": "https://robu.in/product-category/batteries/lipo-batteries/"
+    },
+    {
+      "item": "ESP32-C3 SuperMini / Xiao ESP32-C3 Micro Controller Board",
+      "qty": 1,
+      "price_inr": 90.0,
+      "vendor": "Existing Inventory / Amazon.in",
+      "url": "https://robu.in/product-category/development-boards/esp32/"
+    }
+  ]
+}
