@@ -22,9 +22,7 @@ class ConstantVelocityKalmanTracker:
         Initializes 6-state constant velocity Kalman filter
         """
         # State vector: [cx, cy, A, vx, vy, vA]
-        self.x = np.array(
-            [init_cx, init_cy, init_area, 0.0, 0.0, 0.0], dtype=np.float64
-        )
+        self.x = np.array([init_cx, init_cy, init_area, 0.0, 0.0, 0.0], dtype=np.float64)
 
         # State Covariance matrix P
         self.P = np.diag([10.0, 10.0, 50.0, 100.0, 100.0, 200.0]).astype(np.float64)
@@ -32,9 +30,7 @@ class ConstantVelocityKalmanTracker:
         # Process Noise Covariance Q
         self.q_pos = q_pos
         self.q_vel = q_vel
-        self.Q = np.diag([q_pos, q_pos, q_pos * 2.0, q_vel, q_vel, q_vel * 2.0]).astype(
-            np.float64
-        )
+        self.Q = np.diag([q_pos, q_pos, q_pos * 2.0, q_vel, q_vel, q_vel * 2.0]).astype(np.float64)
 
         # Measurement Noise Covariance R
         self.R = np.diag([r_pos, r_pos, r_area]).astype(np.float64)
@@ -114,9 +110,7 @@ class ConstantVelocityKalmanTracker:
     def area(self) -> float:
         return float(self.x[2])
 
-    def get_predicted_bbox(
-        self, aspect_ratio: float = 1.6
-    ) -> tuple[int, int, int, int]:
+    def get_predicted_bbox(self, aspect_ratio: float = 1.6) -> tuple[int, int, int, int]:
         """
         Returns estimated (x1, y1, x2, y2) bounding box from (cx, cy, Area)
         w * h = Area, w / h = aspect_ratio -> w = sqrt(Area * aspect_ratio), h = w / aspect_ratio

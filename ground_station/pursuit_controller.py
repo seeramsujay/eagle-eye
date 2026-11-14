@@ -27,9 +27,7 @@ class GPSMath:
         dlon = math.radians(lon2 - lon1)
         a = (
             math.sin(dlat / 2.0) ** 2
-            + math.cos(math.radians(lat1))
-            * math.cos(math.radians(lat2))
-            * math.sin(dlon / 2.0) ** 2
+            + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2.0) ** 2
         )
         c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
         return GPSMath.EARTH_RADIUS_M * c
@@ -39,9 +37,7 @@ class GPSMath:
         lat1_r, lat2_r = math.radians(lat1), math.radians(lat2)
         dlon_r = math.radians(lon2 - lon1)
         y = math.sin(dlon_r) * math.cos(lat2_r)
-        x = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(
-            lat2_r
-        ) * math.cos(dlon_r)
+        x = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(dlon_r)
         b_deg = math.degrees(math.atan2(y, x))
         return (b_deg + 360.0) % 360.0
 
@@ -87,17 +83,11 @@ class PursuitController:
         # Visual Servoing PIDs
         # Error normalized to [-1.0, 1.0]
         # Roll: maps dx -> [-35, +35] deg
-        self.pid_roll = PIDVisualServoing(
-            kp=35.0, ki=0.8, kd=4.0, min_val=-35.0, max_val=35.0
-        )
+        self.pid_roll = PIDVisualServoing(kp=35.0, ki=0.8, kd=4.0, min_val=-35.0, max_val=35.0)
         # Pitch: maps dy -> [-15, +20] deg (inverted: target below center -> pitch down/up)
-        self.pid_pitch = PIDVisualServoing(
-            kp=20.0, ki=0.5, kd=2.5, min_val=-15.0, max_val=20.0
-        )
+        self.pid_pitch = PIDVisualServoing(kp=20.0, ki=0.5, kd=2.5, min_val=-15.0, max_val=20.0)
         # Throttle: maps area error -> [35, 85] %
-        self.pid_throttle = PIDVisualServoing(
-            kp=0.003, ki=0.0001, kd=0.0005, min_val=-25.0, max_val=25.0
-        )
+        self.pid_throttle = PIDVisualServoing(kp=0.003, ki=0.0001, kd=0.0005, min_val=-25.0, max_val=25.0)
 
         # Coasting parameters
         self.coast_start_time = 0.0
@@ -175,9 +165,7 @@ class PursuitController:
             cmd_roll = self.pid_roll.update(err_x_norm, dt)
 
             # Pitch: positive error (target below center) -> slight nose down
-            cmd_pitch = (
-                -self.pid_pitch.update(err_y_norm, dt) + 2.0
-            )  # baseline 2° cruise pitch
+            cmd_pitch = -self.pid_pitch.update(err_y_norm, dt) + 2.0  # baseline 2° cruise pitch
             cmd_pitch = max(-15.0, min(20.0, cmd_pitch))
 
             # Throttle: area error = target_area - measured_area
@@ -191,9 +179,7 @@ class PursuitController:
             # Smoothly decays bank angle toward a steady 20° orbit while extrapolating target via Kalman
             decay_factor = min(1.0, time_since_detect / self.coast_duration_limit)
             target_orbit_roll = 20.0  # Standard 20° orbit bank
-            cmd_roll = (
-                1.0 - decay_factor
-            ) * self.coast_initial_roll + decay_factor * target_orbit_roll
+            cmd_roll = (1.0 - decay_factor) * self.coast_initial_roll + decay_factor * target_orbit_roll
             cmd_pitch = 3.0  # Maintain slight positive pitch for orbit
             cmd_throttle = 55  # Maintain steady cruising speed (30-60 km/h)
 
@@ -213,9 +199,7 @@ class PursuitController:
                     car_lat,
                     car_lon,
                 )
-                heading_err = GPSMath.heading_error_degrees(
-                    plane_telemetry.heading_deg, target_bearing
-                )
+                heading_err = GPSMath.heading_error_degrees(plane_telemetry.heading_deg, target_bearing)
 
                 if dist_m > 80.0:
                     # Coordinated turn toward car bearing

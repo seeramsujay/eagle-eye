@@ -19,12 +19,8 @@ from lora_link import (
 
 
 def test_packet_sizes():
-    assert UplinkPacket.SIZE == 16, (
-        f"UplinkPacket must be exactly 16 bytes, got {UplinkPacket.SIZE}"
-    )
-    assert DownlinkPacket.SIZE == 16, (
-        f"DownlinkPacket must be exactly 16 bytes, got {DownlinkPacket.SIZE}"
-    )
+    assert UplinkPacket.SIZE == 16, f"UplinkPacket must be exactly 16 bytes, got {UplinkPacket.SIZE}"
+    assert DownlinkPacket.SIZE == 16, f"DownlinkPacket must be exactly 16 bytes, got {DownlinkPacket.SIZE}"
 
 
 def test_crc16_integrity():
@@ -63,9 +59,7 @@ def test_uplink_pack_unpack_roundtrip():
 
 
 def test_uplink_corruption_rejection():
-    pkt = UplinkPacket(
-        mode=MODE_MANUAL_FPV, roll_deg=10.0, pitch_deg=5.0, throttle_pct=50
-    )
+    pkt = UplinkPacket(mode=MODE_MANUAL_FPV, roll_deg=10.0, pitch_deg=5.0, throttle_pct=50)
     packed = bytearray(pkt.pack())
     # Corrupt a payload byte
     packed[2] ^= 0xFF

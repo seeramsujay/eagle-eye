@@ -58,15 +58,10 @@ class HUDDashboard:
         # 1. Video Recording Initialization
         if self.output_video_path and self.video_writer is None:
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-            self.video_writer = cv2.VideoWriter(
-                self.output_video_path, fourcc, self.fps, (w, h)
-            )
+            self.video_writer = cv2.VideoWriter(self.output_video_path, fourcc, self.fps, (w, h))
 
         # 2. Draw Target Bounding Box & Center Reticle
-        if (
-            tracking_info.get("detected", False)
-            and tracking_info.get("bbox") is not None
-        ):
+        if tracking_info.get("detected", False) and tracking_info.get("bbox") is not None:
             bx1, by1, bx2, by2 = tracking_info["bbox"]
             cv2.rectangle(hud_frame, (bx1, by1), (bx2, by2), (0, 255, 0), 2)
             tcx, tcy = int((bx1 + bx2) / 2), int((by1 + by2) / 2)
@@ -92,9 +87,7 @@ class HUDDashboard:
             px1, py1 = max(0, px1), max(0, py1)
             px2, py2 = min(w - 1, px2), min(h - 1, py2)
             if px2 > px1 and py2 > py1:
-                cv2.rectangle(
-                    hud_frame, (px1, py1), (px2, py2), (255, 200, 0), 1, cv2.LINE_4
-                )
+                cv2.rectangle(hud_frame, (px1, py1), (px2, py2), (255, 200, 0), 1, cv2.LINE_4)
                 k_cx, k_cy = int((px1 + px2) / 2), int((py1 + py2) / 2)
                 vx, vy = tracking_info.get("kalman_velocity", (0.0, 0.0))
                 # Scale velocity vector for visual display (0.3s projection)
@@ -120,18 +113,10 @@ class HUDDashboard:
                 )
 
         # 4. Center Crosshairs (Flight Boresight)
-        cv2.line(
-            hud_frame, (cx - 20, cy), (cx - 6, cy), (255, 255, 255), 1, cv2.LINE_AA
-        )
-        cv2.line(
-            hud_frame, (cx + 6, cy), (cx + 20, cy), (255, 255, 255), 1, cv2.LINE_AA
-        )
-        cv2.line(
-            hud_frame, (cx, cy - 20), (cx, cy - 6), (255, 255, 255), 1, cv2.LINE_AA
-        )
-        cv2.line(
-            hud_frame, (cx, cy + 6), (cx, cy + 20), (255, 255, 255), 1, cv2.LINE_AA
-        )
+        cv2.line(hud_frame, (cx - 20, cy), (cx - 6, cy), (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.line(hud_frame, (cx + 6, cy), (cx + 20, cy), (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.line(hud_frame, (cx, cy - 20), (cx, cy - 6), (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.line(hud_frame, (cx, cy + 6), (cx, cy + 20), (255, 255, 255), 1, cv2.LINE_AA)
         cv2.circle(hud_frame, (cx, cy), 3, (255, 255, 255), -1)
 
         # 5. Artificial Horizon Ladder (Roll & Pitch indication)
@@ -151,9 +136,7 @@ class HUDDashboard:
 
         # 6. Mode & Status Bar (Top Header)
         mode_id = uplink.mode
-        mode_text, mode_color = self.MODE_LABELS.get(
-            mode_id, ("UNKNOWN MODE", (255, 255, 255))
-        )
+        mode_text, mode_color = self.MODE_LABELS.get(mode_id, ("UNKNOWN MODE", (255, 255, 255)))
         if manual_override_active:
             mode_text = "[OVERRIDE] " + mode_text
 
@@ -177,18 +160,12 @@ class HUDDashboard:
         dist_to_car = 0.0
         bearing_to_car = 0.0
         if car_lat != 0.0 and downlink.plane_lat != 0.0:
-            dist_to_car = GPSMath.haversine_distance(
-                downlink.plane_lat, downlink.plane_lon, car_lat, car_lon
-            )
-            bearing_to_car = GPSMath.bearing_degrees(
-                downlink.plane_lat, downlink.plane_lon, car_lat, car_lon
-            )
+            dist_to_car = GPSMath.haversine_distance(downlink.plane_lat, downlink.plane_lon, car_lat, car_lon)
+            bearing_to_car = GPSMath.bearing_degrees(downlink.plane_lat, downlink.plane_lon, car_lat, car_lon)
 
         # Battery warning indicator
         batt_color = (
-            (0, 255, 0)
-            if downlink.batt_v >= 10.5
-            else ((0, 255, 255) if downlink.batt_v >= 9.6 else (0, 0, 255))
+            (0, 255, 0) if downlink.batt_v >= 10.5 else ((0, 255, 255) if downlink.batt_v >= 9.6 else (0, 0, 255))
         )
 
         telem_lines = [
@@ -220,7 +197,9 @@ class HUDDashboard:
 
         # 8. Commanded Flight Actuations (Bottom Bar)
         bot_y = h - 15
-        ctrl_str = f"CMD: Roll={uplink.roll_deg:+.1f} deg | Pitch={uplink.pitch_deg:+.1f} deg | Thr={uplink.throttle_pct}%"
+        ctrl_str = (
+            f"CMD: Roll={uplink.roll_deg:+.1f} deg | Pitch={uplink.pitch_deg:+.1f} deg | Thr={uplink.throttle_pct}%"
+        )
         cv2.putText(
             hud_frame,
             ctrl_str,

@@ -16,9 +16,7 @@ from pursuit_controller import PursuitController
 from video_tracker import AerialVideoTracker
 
 
-def create_synthetic_frame(
-    car_visible: bool, car_x: int, car_y: int, car_w: int = 80, car_h: int = 40
-) -> np.ndarray:
+def create_synthetic_frame(car_visible: bool, car_x: int, car_y: int, car_w: int = 80, car_h: int = 40) -> np.ndarray:
     """
     Creates a 640x480 frame with road background and optional visible car box
     """
@@ -81,9 +79,7 @@ def test_end_to_end_occlusion_and_recovery_pipeline():
         state_history.append(uplink.mode)
 
     # Must be in VISION_TRACK during clear visibility
-    assert state_history[-1] == MODE_VISION_TRACK, (
-        f"Expected VISION_TRACK, got {state_history[-1]}"
-    )
+    assert state_history[-1] == MODE_VISION_TRACK, f"Expected VISION_TRACK, got {state_history[-1]}"
 
     # Phase 2: Car enters tunnel occlusion (target disappears for 1.0s = 25 frames)
     # Controller must enter KALMAN_COAST (0 - 2.5s)
@@ -110,9 +106,7 @@ def test_end_to_end_occlusion_and_recovery_pipeline():
         uplink = pursuit.update(t_info, plane_telem, car_lat, car_lon, dt)
         gps_pursuit_states.append(uplink.mode)
 
-    assert gps_pursuit_states[-1] == MODE_GPS_PURSUIT, (
-        f"Expected GPS_PURSUIT after >2.5s, got {gps_pursuit_states[-1]}"
-    )
+    assert gps_pursuit_states[-1] == MODE_GPS_PURSUIT, f"Expected GPS_PURSUIT after >2.5s, got {gps_pursuit_states[-1]}"
 
     # Phase 4: Target emerges from occlusion!
     # Re-acquisition requires 10 consecutive frames before returning to VISION_TRACK
@@ -137,6 +131,4 @@ def test_end_to_end_occlusion_and_recovery_pipeline():
 
     # Frame 10: 10th consecutive frame -> Transitions back to VISION_TRACK!
     uplink_10th = pursuit.update(t_info, plane_telem, car_lat, car_lon, dt)
-    assert uplink_10th.mode == MODE_VISION_TRACK, (
-        f"Expected VISION_TRACK after 10 frames, got {uplink_10th.mode}"
-    )
+    assert uplink_10th.mode == MODE_VISION_TRACK, f"Expected VISION_TRACK after 10 frames, got {uplink_10th.mode}"

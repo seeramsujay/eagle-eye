@@ -71,9 +71,7 @@ def test_visual_servoing_pid_bounds():
 
 def test_pursuit_controller_vision_servo_response():
     pursuit = PursuitController(target_box_area=10000.0)
-    telem = DownlinkPacket(
-        plane_lat=15.0, plane_lon=73.0, alt_m=50.0, speed_kmh=45.0, heading_deg=90.0
-    )
+    telem = DownlinkPacket(plane_lat=15.0, plane_lon=73.0, alt_m=50.0, speed_kmh=45.0, heading_deg=90.0)
 
     # Target off-center to the right (error_x_norm = +0.5)
     tracking_info = {

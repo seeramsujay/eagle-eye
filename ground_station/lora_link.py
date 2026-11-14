@@ -104,12 +104,8 @@ class UplinkPacket:
         payload, crc_rec = data[:14], struct.unpack("<H", data[14:16])[0]
         if calculate_crc16(payload) != crc_rec:
             return None  # CRC failure
-        mode, roll_cdeg, pitch_cdeg, thr, lat_e7, lon_e7 = struct.unpack(
-            "<BhhBii", payload
-        )
-        pkt = cls(
-            mode, roll_cdeg / 100.0, pitch_cdeg / 100.0, thr, lat_e7 / 1e7, lon_e7 / 1e7
-        )
+        mode, roll_cdeg, pitch_cdeg, thr, lat_e7, lon_e7 = struct.unpack("<BhhBii", payload)
+        pkt = cls(mode, roll_cdeg / 100.0, pitch_cdeg / 100.0, thr, lat_e7 / 1e7, lon_e7 / 1e7)
         return pkt
 
 
@@ -154,9 +150,7 @@ class DownlinkPacket:
         spd = max(0, min(255, int(self.speed_kmh)))
         hdg_div2 = max(0, min(179, int((self.heading_deg % 360.0) / 2.0)))
         batt_x10 = max(0, min(255, int(self.batt_v * 10.0)))
-        partial = struct.pack(
-            "<iihBBBB", lat_e7, lon_e7, alt_m, spd, hdg_div2, batt_x10, self.state_flags
-        )
+        partial = struct.pack("<iihBBBB", lat_e7, lon_e7, alt_m, spd, hdg_div2, batt_x10, self.state_flags)
         crc = calculate_crc16(partial)
         return partial + struct.pack("<H", crc)
 
@@ -167,9 +161,7 @@ class DownlinkPacket:
         payload, crc_rec = data[:14], struct.unpack("<H", data[14:16])[0]
         if calculate_crc16(payload) != crc_rec:
             return None
-        lat_e7, lon_e7, alt_m, spd, hdg_div2, batt_x10, flags = struct.unpack(
-            "<iihBBBB", payload
-        )
+        lat_e7, lon_e7, alt_m, spd, hdg_div2, batt_x10, flags = struct.unpack("<iihBBBB", payload)
         pkt = cls(
             lat_e7 / 1e7,
             lon_e7 / 1e7,
@@ -189,9 +181,7 @@ class LoRaLink:
     and mock loopback transport for offline simulation.
     """
 
-    def __init__(
-        self, port: str | None = None, baudrate: int = 921600, mock_mode: bool = False
-    ):
+    def __init__(self, port: str | None = None, baudrate: int = 921600, mock_mode: bool = False):
         self.port = port
         self.baudrate = baudrate
         self.mock_mode = mock_mode
@@ -227,9 +217,7 @@ class LoRaLink:
             self.rx_thread.start()
             return True
         except (OSError, ImportError, RuntimeError) as e:
-            print(
-                f"[LoRaLink] Serial connection failed: {e}. Falling back to mock mode."
-            )
+            print(f"[LoRaLink] Serial connection failed: {e}. Falling back to mock mode.")
             self.mock_mode = True
             self.running = True
             return True
@@ -247,9 +235,7 @@ class LoRaLink:
         if self.mock_mode:
             # Immediate loopback simulation: generate plausible downlink
             with self.lock:
-                self.mock_plane_heading = (
-                    self.mock_plane_heading + packet.roll_deg * 0.1
-                ) % 360.0
+                self.mock_plane_heading = (self.mock_plane_heading + packet.roll_deg * 0.1) % 360.0
                 downlink = DownlinkPacket(
                     plane_lat=self.mock_plane_lat,
                     plane_lon=self.mock_plane_lon,
@@ -279,23 +265,16 @@ class LoRaLink:
                 chunk = self.serial_handle.read(64)
                 if chunk:
                     buffer.extend(chunk)
-                    while (
-                        len(buffer) >= 22
-                    ):  # Min frame size = 4 hdr + 16 payload + 2 crc
+                    while len(buffer) >= 22:  # Min frame size = 4 hdr + 16 payload + 2 crc
                         if buffer[0] == FRAME_HEADER_1 and buffer[1] == FRAME_HEADER_2:
                             ftype = buffer[2]
                             flen = buffer[3]
                             if len(buffer) < 4 + flen + 2:
                                 break  # Wait for full frame
                             payload = bytes(buffer[4 : 4 + flen])
-                            frame_crc = struct.unpack(
-                                "<H", buffer[4 + flen : 4 + flen + 2]
-                            )[0]
+                            frame_crc = struct.unpack("<H", buffer[4 + flen : 4 + flen + 2])[0]
                             if calculate_crc16(payload) == frame_crc:
-                                if (
-                                    ftype == FRAME_TYPE_DOWNLINK
-                                    and flen == DownlinkPacket.SIZE
-                                ):
+                                if ftype == FRAME_TYPE_DOWNLINK and flen == DownlinkPacket.SIZE:
                                     downlink = DownlinkPacket.unpack(payload)
                                     if downlink:
                                         with self.lock:

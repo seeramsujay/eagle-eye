@@ -22,9 +22,7 @@ from video_tracker import AerialVideoTracker
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Project Eagle-Eye Laptop Ground Station"
-    )
+    parser = argparse.ArgumentParser(description="Project Eagle-Eye Laptop Ground Station")
     parser.add_argument(
         "--source",
         type=str,
@@ -43,9 +41,7 @@ def parse_args():
         default=True,
         help="Run in mock/simulation mode without hardware",
     )
-    parser.add_argument(
-        "--record", type=str, default=None, help="Path to save MP4 flight recording"
-    )
+    parser.add_argument("--record", type=str, default=None, help="Path to save MP4 flight recording")
     parser.add_argument(
         "--car-lat",
         type=float,
@@ -71,9 +67,7 @@ def main():
     src = int(args.source) if args.source.isdigit() else args.source
     cap = cv2.VideoCapture(src)
     if not cap.isOpened():
-        print(
-            f"[WARN] Cannot open video source {src}. Switching to synthetic test feed."
-        )
+        print(f"[WARN] Cannot open video source {src}. Switching to synthetic test feed.")
         cap = None
 
     # 2. Initialize Subsystems
@@ -122,9 +116,7 @@ def main():
                 car_w, car_h = 100, 50
                 x1 = int(synthetic_x - car_w // 2)
                 y1 = int(synthetic_y - car_h // 2)
-                cv2.rectangle(
-                    frame, (x1, y1), (x1 + car_w, y1 + car_h), (200, 140, 40), -1
-                )
+                cv2.rectangle(frame, (x1, y1), (x1 + car_w, y1 + car_h), (200, 140, 40), -1)
                 cv2.putText(
                     frame,
                     "SIMULATED CAR",
@@ -148,9 +140,7 @@ def main():
             )
 
             # 3. Compute Autonomous Pursuit Commands
-            auto_uplink = pursuit.update(
-                tracking_info, plane_telem, args.car_lat, args.car_lon, dt
-            )
+            auto_uplink = pursuit.update(tracking_info, plane_telem, args.car_lat, args.car_lon, dt)
 
             # 4. Check & Apply Instant Manual FPV Override (< 5 ms)
             final_uplink, is_override = manual_mgr.apply_override_if_active(auto_uplink)
