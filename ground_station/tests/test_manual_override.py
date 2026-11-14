@@ -22,21 +22,15 @@ def test_instant_override_trigger_latency():
     avg_lat = sum(latencies) / len(latencies)
 
     # Verification: Must strictly preempt in < 5.0 milliseconds
-    assert max_lat < 5.0, (
-        f"Max preemption latency {max_lat:.3f} ms exceeded 5.0 ms ceiling"
-    )
-    assert avg_lat < 1.0, (
-        f"Avg preemption latency {avg_lat:.3f} ms was unexpectedly high"
-    )
+    assert max_lat < 5.0, f"Max preemption latency {max_lat:.3f} ms exceeded 5.0 ms ceiling"
+    assert avg_lat < 1.0, f"Avg preemption latency {avg_lat:.3f} ms was unexpectedly high"
 
 
 def test_override_command_preemption():
     mgr = ManualOverrideManager()
     mgr.set_sticks(roll=0.5, pitch=-0.3, throttle_pct=80)
 
-    auto_cmd = UplinkPacket(
-        mode=MODE_VISION_TRACK, roll_deg=10.0, pitch_deg=2.0, throttle_pct=50
-    )
+    auto_cmd = UplinkPacket(mode=MODE_VISION_TRACK, roll_deg=10.0, pitch_deg=2.0, throttle_pct=50)
 
     # When override is inactive: auto command passes through
     out_cmd, is_override = mgr.apply_override_if_active(auto_cmd)

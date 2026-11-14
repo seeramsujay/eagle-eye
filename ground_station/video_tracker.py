@@ -37,9 +37,7 @@ class AerialVideoTracker:
 
                 self.yolo_model = YOLO(model_name)
             except (ImportError, RuntimeError, ValueError) as e:
-                print(
-                    f"[AerialVideoTracker] Warning: YOLO init failed ({e}). Defaulting to CSRT tracker."
-                )
+                print(f"[AerialVideoTracker] Warning: YOLO init failed ({e}). Defaulting to CSRT tracker.")
                 self.use_yolo = False
 
     def init_manual_roi(self, frame: np.ndarray, bbox: tuple[int, int, int, int]):
@@ -99,9 +97,9 @@ class AerialVideoTracker:
             "kalman_pred_bbox": None,
             "kalman_velocity": (0.0, 0.0),
             "consecutive_detects": self.consecutive_detect_frames,
-            "time_since_detect": current_time - self.last_detection_timestamp
-            if self.last_detection_timestamp > 0
-            else 999.0,
+            "time_since_detect": (
+                current_time - self.last_detection_timestamp if self.last_detection_timestamp > 0 else 999.0
+            ),
         }
 
         # 1. Kalman Prediction step
@@ -115,9 +113,7 @@ class AerialVideoTracker:
         # 2. YOLOv8 Detection (Class 2 = car in COCO)
         if self.use_yolo and self.yolo_model is not None:
             try:
-                detections = self.yolo_model(
-                    frame, classes=[2], conf=self.conf_thresh, verbose=False
-                )[0]
+                detections = self.yolo_model(frame, classes=[2], conf=self.conf_thresh, verbose=False)[0]
                 best_iou = 0.0
                 best_box = None
 
@@ -210,9 +206,7 @@ class AerialVideoTracker:
         return result
 
     @staticmethod
-    def _calculate_iou(
-        boxA: tuple[float, float, float, float], boxB: tuple[float, float, float, float]
-    ) -> float:
+    def _calculate_iou(boxA: tuple[float, float, float, float], boxB: tuple[float, float, float, float]) -> float:
         xA = max(boxA[0], boxB[0])
         yA = max(boxA[1], boxB[1])
         xB = min(boxA[2], boxB[2])

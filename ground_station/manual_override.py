@@ -66,9 +66,7 @@ class ManualOverrideManager:
             self.stick_pitch = max(-1.0, min(1.0, pitch))
             self.stick_throttle_pct = max(0, min(100, int(throttle_pct)))
 
-    def apply_override_if_active(
-        self, autonomous_uplink: UplinkPacket
-    ) -> tuple[UplinkPacket, bool]:
+    def apply_override_if_active(self, autonomous_uplink: UplinkPacket) -> tuple[UplinkPacket, bool]:
         """
         Preempts autonomous uplink command if manual override is active.
         Execution completes in < 5 microseconds.
@@ -81,11 +79,7 @@ class ManualOverrideManager:
                 # Roll [-1.0, 1.0] -> [-35.0, +35.0] deg
                 # Pitch [-1.0, 1.0] -> [-15.0, +20.0] deg
                 roll_deg = self.stick_roll * 35.0
-                pitch_deg = (
-                    self.stick_pitch * 20.0
-                    if self.stick_pitch >= 0
-                    else self.stick_pitch * 15.0
-                )
+                pitch_deg = self.stick_pitch * 20.0 if self.stick_pitch >= 0 else self.stick_pitch * 15.0
                 throttle = self.stick_throttle_pct
 
                 override_pkt = UplinkPacket(
@@ -158,15 +152,10 @@ class ManualOverrideManager:
                             elif num == 1:  # Pitch (Elevator stick)
                                 self.stick_pitch = -norm_val  # Invert standard joystick
                             elif num == 2 or num == 3:  # Throttle stick
-                                self.stick_throttle_pct = int(
-                                    ((norm_val + 1.0) / 2.0) * 100
-                                )
+                                self.stick_throttle_pct = int(((norm_val + 1.0) / 2.0) * 100)
 
                             # If stick moved significantly from center, trigger takeover
-                            if (
-                                abs(self.stick_roll) > 0.15
-                                or abs(self.stick_pitch) > 0.15
-                            ):
+                            if abs(self.stick_roll) > 0.15 or abs(self.stick_pitch) > 0.15:
                                 self.manual_override_active = True
                                 self.desired_mode = MODE_MANUAL_FPV
         except (OSError, struct.error):
