@@ -1,0 +1,141 @@
+{
+  "project": "Project Eagle-Eye",
+  "currency": "INR",
+  "budget_ceiling": 2000.0,
+  "owned_inventory": [
+    {
+      "component": "ESP32-WROOM-32 DevKit (38-pin)",
+      "qty": 2,
+      "cost": 0.0,
+      "source": "Existing Inventory"
+    },
+    {
+      "component": "Ai-Thinker Ra-02 SX1278 433MHz LoRa Modules",
+      "qty": 2,
+      "cost": 0.0,
+      "source": "Existing Inventory"
+    },
+    {
+      "component": "FPV Analog/Digital Camera + 5.8GHz VTX + Ground USB Receiver",
+      "qty": 1,
+      "cost": 0.0,
+      "source": "Existing Inventory"
+    },
+    {
+      "component": "High-Drain 18650 Li-ion Cells (3S1P 11.1V pack)",
+      "qty": 3,
+      "cost": 0.0,
+      "source": "Existing Inventory"
+    },
+    {
+      "component": "3D Printer (PLA/PETG) & Standard Hand Tools",
+      "qty": 1,
+      "cost": 0.0,
+      "source": "Existing Inventory"
+    }
+  ],
+  "purchased_bom": [
+    {
+      "category": "Propulsion",
+      "item": "A2212 1400KV Brushless Motor",
+      "qty": 1,
+      "unit_price": 395.0,
+      "total_price": 395.0,
+      "vendor": "QuartzComponents",
+      "sku": "MTR-QC0422",
+      "url": "https://quartzcomponents.com/products/a2212-1400kv-brushless-motor-bldc",
+      "verified_stock": true
+    },
+    {
+      "category": "Propulsion",
+      "item": "SimonK 30A BLDC ESC with 5V 2A BEC",
+      "qty": 1,
+      "unit_price": 305.0,
+      "total_price": 305.0,
+      "vendor": "QuartzComponents",
+      "sku": "MTR-QC0435",
+      "url": "https://quartzcomponents.com/products/bldc-30a-esc-brushless-dc-motor-electronic-speed-controller",
+      "verified_stock": true
+    },
+    {
+      "category": "Propulsion",
+      "item": "Orange Pro-Range 8045 Propeller (1 CW + 1 CCW Pair)",
+      "qty": 1,
+      "unit_price": 80.0,
+      "total_price": 80.0,
+      "vendor": "Robu.in",
+      "sku": "PROP-8045-BLK",
+      "url": "https://robu.in/product/pro-range-propellers-80458x4-5-abs-black-1cw-1ccw-1pair/",
+      "verified_stock": true
+    },
+    {
+      "category": "Sensors",
+      "item": "GY-521 MPU-6050 6-DOF IMU (Accelerometer + Gyroscope)",
+      "qty": 1,
+      "unit_price": 127.0,
+      "total_price": 127.0,
+      "vendor": "QuartzComponents",
+      "sku": "SNS-QC0312",
+      "url": "https://quartzcomponents.com/products/mpu6050-gyroscope-and-accelerometer-module",
+      "verified_stock": true
+    },
+    {
+      "category": "Navigation",
+      "item": "u-blox NEO-6M GPS Module with Ceramic Antenna & EEPROM",
+      "qty": 1,
+      "unit_price": 233.0,
+      "total_price": 233.0,
+      "vendor": "QuartzComponents",
+      "sku": "MOD-QC0871",
+      "url": "https://quartzcomponents.com/products/neo-6m-gps-module",
+      "verified_stock": true
+    },
+    {
+      "category": "Actuators",
+      "item": "TowerPro SG90 9g Micro Servo Motor",
+      "qty": 2,
+      "unit_price": 86.0,
+      "total_price": 172.0,
+      "vendor": "QuartzComponents",
+      "sku": "SRV-QC0119",
+      "url": "https://quartzcomponents.com/products/tower-pro-sg90-servo-motor",
+      "verified_stock": true
+    },
+    {
+      "category": "Power & Decoupling",
+      "item": "AMS1117-3.3V Step-down LDO Module + 100uF 16V Low-ESR Capacitor",
+      "qty": 1,
+      "unit_price": 25.0,
+      "total_price": 25.0,
+      "vendor": "QuartzComponents / ElectronicsComp",
+      "sku": "PWR-AMS1117-3V3",
+      "url": "https://quartzcomponents.com/products/ams1117-3-3v-power-supply-module",
+      "verified_stock": true
+    },
+    {
+      "category": "Airframe",
+      "item": "5mm Sunpack / Coroplast Polypropylene Flute Board (1000mm x 600mm)",
+      "qty": 1,
+      "unit_price": 120.0,
+      "total_price": 120.0,
+      "vendor": "Local Signage / Stationery / Amazon.in",
+      "sku": "AIR-CORO-5MM",
+      "url": "https://www.amazon.in/dp/B08X4N6N34",
+      "verified_stock": true
+    },
+    {
+      "category": "Hardware & Linkages",
+      "item": "Bamboo / Fiberglass Spars (4mm x 1000mm x 2) + Pushrods, Control Horns",
+      "qty": 1,
+      "unit_price": 60.0,
+      "total_price": 60.0,
+      "vendor": "Local Kite/Hardware / Robu.in",
+      "sku": "HW-SPAR-LINK",
+      "url": "https://robu.in/product-category/diy-kits-hobby-toys/",
+      "verified_stock": true
+    }
+  ],
+  "estimated_shipping_inr": 50.0,
+  "total_new_spend_inr": 1567.0,
+  "budget_headroom_inr": 433.0
+}
