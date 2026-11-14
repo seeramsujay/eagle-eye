@@ -69,7 +69,7 @@ class AerialVideoTracker:
                 hist = cv2.calcHist([hsv], [0, 1], None, [16, 16], [0, 180, 0, 256])
                 cv2.normalize(hist, hist, 0, 1, cv2.NORM_MINMAX)
                 self.reference_hist = hist
-        except (cv2.error, ValueError, TypeError):
+        except (cv2.error, AttributeError, ValueError, TypeError):
             self.csrt_tracker = None
             self.reference_hist = None
 
