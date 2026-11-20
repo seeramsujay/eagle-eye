@@ -1,13 +1,24 @@
-# Project Eagle-Eye: Autonomous Car-Tracking Fixed-Wing Flying Wing
-
 <div align="center">
 
-**Ultra-Low-Cost (< ₹2,000 INR New Spend) Autonomous Drone System**  
-*Autonomous AI Visual Servoing • 25 Hz LoRa 433MHz Telemetry • 3-Tier Failsafe • Instant Manual FPV Override*
+<img src="assets/logo.svg" alt="Project Eagle-Eye Logo" width="240" />
 
-</div>
+# Project Eagle-Eye
+
+### *Autonomous Car-Tracking Fixed-Wing Flying Wing Drone & High-Speed Visual Servoing System*
+
+[![Flight Controller](https://img.shields.io/badge/Flight%20Controller-ESP32%20FreeRTOS%20%7C%20500Hz-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](firmware/airborne_fc/)
+[![Computer Vision](https://img.shields.io/badge/Vision-YOLOv8n%20%7C%20ByteTrack-00FFFF?style=for-the-badge&logo=opencv&logoColor=black)](ground_station/video_tracker.py)
+[![Telemetry](https://img.shields.io/badge/Telemetry-SX1278%20LoRa%20433MHz-F59E0B?style=for-the-badge)](firmware/ground_lora_bridge/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Engineering Roadmap](https://img.shields.io/badge/Engineering-Future%20Roadmap-8A2BE2?style=for-the-badge)](future.md)
+
+<p align="center">
+  <b>Ultra-Low-Cost (&lt; ₹2,000 INR New Spend) Autonomous Drone System: Real-time visual servoing, 25 Hz LoRa telemetry, 3-tier failsafe state machine, and instant manual FPV override.</b>
+</p>
 
 ---
+
+</div>
 
 ## 1. System Overview
 **Project Eagle-Eye** is an autonomous hardware-software robotic system featuring a 920mm swept flying wing engineered to autonomously acquire, orbit, film, and pursue a moving car (30–60 km/h) along open highways, coastal routes, and mountain terrain while supporting deterministic sub-5ms manual FPV control takeover.
@@ -90,25 +101,37 @@ The entire system was researched, architected, and built under a strict new expe
 ### Running the Python Ground Station
 ```bash
 # Run ground station in simulation mode (synthetic car video + mock LoRa link)
-python3 /dev/shm/eagle-eye/ground_station/main.py --mock
+python3 ground_station/main.py --mock
 
 # Run ground station with live USB FPV receiver and hardware LoRa bridge
-python3 /dev/shm/eagle-eye/ground_station/main.py --source 0 --port /dev/ttyUSB0 --record flight.mp4
+python3 ground_station/main.py --source 0 --port /dev/ttyUSB0 --record flight.mp4
 ```
 
 ### Running Automated Test Suite
 ```bash
-# Python Ground Station unit & integration tests (18 tests, 100% pass)
-pytest /dev/shm/eagle-eye/ground_station/tests/ -v
+# Python Ground Station unit & integration tests
+pytest ground_station/tests/ -v
 
 # C++ Firmware core algorithms, structs, and failsafe verification
-/dev/shm/eagle-eye/firmware/test_firmware_math
+./firmware/test_firmware_math
 ```
 
 ### 3D Printing the Airframe Parts
-The `.stl` files in `/dev/shm/eagle-eye/cad/` are ready to slice:
+The `.stl` files in `cad/` are ready to slice:
 - Material: PLA+ or PETG
 - Layer Height: 0.20 mm
 - Infill: 20% Gyroid
 - Wall Perimeters: 3
 - Weight: Pod (~72g), Camera Mount (~24g), Battery Sled (~18g)
+
+---
+
+## 🔮 Engineering Roadmap
+
+For on-board NPU edge inference, ExpressLRS integration, and RTK-GPS rooftop landing targets, explore the [Future Roadmap](future.md).
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for details.
